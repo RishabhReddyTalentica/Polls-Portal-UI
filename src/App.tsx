@@ -7,6 +7,7 @@ import SignUpPage from './components/SignUpPage/SignUpPage';
 import AuthContext from './store/user-context';
 import DashboardLayout from './components/DashboardLayout/DashboardLayout';
 import AdminDashboard from './components/AdminDashboard/AdminDashboard';
+import CreatePoll from './components/CreatePoll/CreatePoll';
 
 function App() {
   const authCtx = useContext(AuthContext);
@@ -16,6 +17,7 @@ function App() {
         <Routes>
           <Route path="/" element={<DashboardLayout><AdminDashboard /></DashboardLayout>} />
           <Route path="/adminDashboard" element={<DashboardLayout><AdminDashboard /></DashboardLayout>} />
+          <Route path="/createnewpoll" element={<CreatePoll />} />
           <Route path="*" element={<Navigate to='/' replace />} />
         </Routes>
         :

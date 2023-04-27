@@ -1,3 +1,4 @@
+import { Poll } from "../models/Poll";
 import { UserData } from "../models/UserData";
 
 
@@ -48,4 +49,21 @@ export async function userLogin(loginInfo: any): Promise<any> {
         }
     };
     return "not found";
+}
+
+export async function createPoll(pollData: Poll) {
+    const response1 = await fetch(`${FIREBASE_DOMAIN}/Polls.json`, {
+        method: "POST",
+        body: JSON.stringify(pollData),
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+    //const data1 = await response1.json();
+
+    if (!response1.ok) {
+        return "error";
+    }
+
+    return "success";
 }
