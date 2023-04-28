@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import './App.scss';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import MainHeader from './components/MainHeader/MainHeader';
@@ -8,16 +8,33 @@ import AuthContext from './store/user-context';
 import DashboardLayout from './components/DashboardLayout/DashboardLayout';
 import AdminDashboard from './components/AdminDashboard/AdminDashboard';
 import CreatePoll from './components/CreatePoll/CreatePoll';
+import { useDispatch } from 'react-redux';
+import { fetchPollData } from './store/polls-actions';
+import UserDashboard from './components/UserDashboard/UserDashboard';
+import UserPollForm from './components/UserPollForm/UserPollForm';
 
 function App() {
   const authCtx = useContext(AuthContext);
+  const dispatch = useDispatch<any>();
+
+  useEffect(() => {
+    dispatch(fetchPollData())
+  }, [])
   return (
     <MainHeader>
       {authCtx.isLoggedIn ?
         <Routes>
-          <Route path="/" element={<DashboardLayout><AdminDashboard /></DashboardLayout>} />
-          <Route path="/adminDashboard" element={<DashboardLayout><AdminDashboard /></DashboardLayout>} />
-          <Route path="/createnewpoll" element={<CreatePoll />} />
+          <Route path="/" element={<DashboardLayout>{authCtx.userData?.role === "Admin" ? <AdminDashboard /> : <UserDashboard />}</DashboardLayout>} />
+          {authCtx.userData?.role === "Admin" &&
+            <Route path="/adminDashboard" element={<DashboardLayout><AdminDashboard /></DashboardLayout>} />}
+          {authCtx.userData?.role !== "Admin" &&
+            <Route path="/userdashboard" element={<DashboardLayout><UserDashboard /></DashboardLayout>} />}
+          {authCtx.userData?.role === "Admin" &&
+            <Route path="/createnewpoll" element={<CreatePoll />} />}
+          {authCtx.userData?.role === "Admin" &&
+            <Route path="/openpoll/:pollId" element={<CreatePoll />} />}
+          {authCtx.userData?.role !== "Admin" &&
+            <Route path="/userpollform/:pollId" element={<UserPollForm />} />}
           <Route path="*" element={<Navigate to='/' replace />} />
         </Routes>
         :

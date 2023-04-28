@@ -1,19 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Container, Row, Col, Card, Form, Button, Navbar } from "react-bootstrap";
 import { Question } from "../../models/Question";
 import { toast } from "react-toastify";
 import { Poll } from "../../models/Poll";
-import { createPoll } from "../../services/api";
-import { Link, useNavigate } from "react-router-dom";
+import { createPoll, updatePoll } from "../../services/api";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Loader from "../Loader/Loader";
+import { useDispatch } from "react-redux";
+import { fetchPollData } from "../../store/polls-actions";
+
 
 
 const CreatePoll: React.FC = (props) => {
     const [pollTitle, setPollTitle] = useState<string>("");
     const [pollQuestions, setPollQuestions] = useState<Question[]>([{ label: "", options: ["", ""] }]);
+    const [canEdit, setCanEdit] = useState<boolean>(true);
     const [showLoader, setShowLoader] = useState<boolean>(false);
     const navigate = useNavigate();
-
+    const dispatch = useDispatch<any>();
+    const location = useLocation();
     const onPollTitleChangeHandler = (
         event: React.ChangeEvent<HTMLInputElement>
     ) => {
@@ -87,12 +92,49 @@ const CreatePoll: React.FC = (props) => {
                 }
                 else {
                     toast.success("Poll created successfully");
+                    dispatch(fetchPollData());
                     navigate("/adminDashboard", { replace: true });
                 }
             });
         }
 
     }
+
+    const onClosePollClickHandler = () => {
+        setShowLoader(true);
+        let pollSubmitObject: Poll = {
+            title: pollTitle,
+            questions: pollQuestions,
+            status: "closed",
+            id: location.state.pollData.id
+        }
+        updatePoll(pollSubmitObject).then((data) => {
+            setShowLoader(false);
+            if (data === "error") {
+                toast.error("could not close poll error occured");
+            }
+            else {
+                toast.success("Poll updated successfully");
+                dispatch(fetchPollData());
+                navigate("/adminDashboard", { replace: true });
+            }
+        })
+    }
+
+    useEffect(() => {
+
+        console.log(location.pathname);
+        if (location.state === null && location.pathname.includes("openpoll")) {
+            navigate("/adminDashboard", { replace: true });
+        }
+        else {
+            if (location.state && location.state.pollData && location.pathname.includes("openpoll")) {
+                setPollTitle(location.state.pollData.title);
+                setPollQuestions(location.state.pollData.questions);
+                setCanEdit(false);
+            }
+        }
+    }, []);
 
     return (
         <Container>
@@ -113,15 +155,20 @@ const CreatePoll: React.FC = (props) => {
                                         <strong><span style={{ color: "red" }}>*</span> Poll Name</strong>
                                     </Form.Label>
                                     <Form.Control type="text" id="pollname" placeholder="Enter poll name" value={pollTitle}
-                                        onChange={onPollTitleChangeHandler} />
+                                        onChange={onPollTitleChangeHandler} disabled={!canEdit} />
                                 </Form.Group>
 
                                 <Row className="mb-3 align-items-center">
                                     <Navbar sticky="top">
                                         <Col xs={12} sm={12} md={12} lg={12} xl={12} xxl={12} className="text-end">
-                                            <Button variant="primary" type="button" onClick={onAddQuestionClickHandler}>
+                                            {canEdit ? <Button variant="primary" type="button" onClick={onAddQuestionClickHandler}>
                                                 Add Question
                                             </Button>
+                                                :
+                                                <Button variant="primary" type="button" onClick={onClosePollClickHandler}>
+                                                    Close Poll
+                                                </Button>
+                                            }
                                         </Col>
                                     </Navbar>
                                     <Col xs={12} sm={12} md={12} lg={12} xl={12} xxl={12}>
@@ -133,21 +180,22 @@ const CreatePoll: React.FC = (props) => {
                                                             <strong><span style={{ color: "red" }}>*</span> {`Q)${index + 1}`}</strong>
                                                         </Form.Label>
                                                         <Form.Control type="text" placeholder="Enter question" defaultValue={question.label}
-                                                            onChange={(event) => { onQuestionLabelChangeHandler(index, event) }}
+                                                            onChange={(event) => { onQuestionLabelChangeHandler(index, event) }} disabled={!canEdit}
                                                         />
                                                     </Col>
 
                                                     <Col xs={12} sm={12} md={3} lg={3} xl={3} xxl={3} className="text-end" style={{ marginTop: "20px" }}>
-                                                        <Button variant="outline-primary" type="button" onClick={(e) => { onAddNewOptionHandler(index) }}>
+                                                        {canEdit && <Button variant="outline-primary" type="button" onClick={(e) => { onAddNewOptionHandler(index) }}>
                                                             Add Option
-                                                        </Button>
+                                                        </Button>}
                                                     </Col>
                                                     <Row>
                                                         {question.options.map((option, i) => {
                                                             return (
                                                                 <Row key={i}>
                                                                     <Col xs={12} sm={12} md={6} lg={6} xl={6} xxl={6} style={{ marginTop: "10px" }}>
-                                                                        <Form.Control type="text" placeholder={`Enter option ${i + 1}`} value={option} onChange={(e) => { onChangeOptionHandler(i, index, e) }} />
+                                                                        <Form.Control type="text" placeholder={`Enter option ${i + 1}`} value={option} onChange={(e) => { onChangeOptionHandler(i, index, e) }}
+                                                                            disabled={!canEdit} />
                                                                     </Col>
                                                                 </Row>
                                                             );
@@ -173,9 +221,9 @@ const CreatePoll: React.FC = (props) => {
                                     </Col>
                                     {/*<Col xs={5} sm={5} md={5} lg={5} xl={5} xxl={5}></Col> */}
                                     <Col xs={12} sm={12} md={12} lg={12} xl={12} xxl={12} className="text-end">
-                                        <Button variant="outline-primary" type="submit" onClick={onPollSubmitHandler}>
+                                        {canEdit && <Button variant="outline-primary" type="submit" onClick={onPollSubmitHandler}>
                                             Submit Poll
-                                        </Button>
+                                        </Button>}
                                     </Col>
                                 </Row>
                             </Form>

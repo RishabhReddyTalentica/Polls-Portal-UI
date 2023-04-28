@@ -67,3 +67,78 @@ export async function createPoll(pollData: Poll) {
 
     return "success";
 }
+
+export async function updatePoll(pollData: Poll) {
+    const polls: any = await fetchAllPolls();
+    const index = polls.findIndex((poll: Poll) => {
+        return poll.id === pollData.id
+    });
+    polls[index].status = "closed";
+    const response1 = await fetch(`${FIREBASE_DOMAIN}/Polls.json`, {
+        method: "PUT",
+        body: JSON.stringify(polls),
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+    //const data1 = await response1.json();
+
+    if (!response1.ok) {
+        return "error";
+    }
+
+    return "success";
+}
+
+export async function userPollSubmitted(submittedData: any) {
+    const response1 = await fetch(`${FIREBASE_DOMAIN}/UsersPollsSubmitted.json`, {
+        method: "POST",
+        body: JSON.stringify(submittedData),
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+    //const data1 = await response1.json();
+
+    if (!response1.ok) {
+        return "error";
+    }
+
+    return "success";
+}
+
+export async function fetchUserSubmittedPolls(userId: any) {
+    const response = await fetch(`${FIREBASE_DOMAIN}/UsersPollsSubmitted.json`);
+    const data = await response.json();
+    if (!response.ok) {
+        return "error";
+    }
+    let submittedPolls: any[] = [];
+    for (const key in data) {
+        if (data[key]["user"] === userId) {
+            submittedPolls.push(data[key]);
+        }
+    }
+    return submittedPolls;
+}
+
+export async function fetchAllPolls(): Promise<Poll[] | string> {
+    const response = await fetch(`${FIREBASE_DOMAIN}/Polls.json`);
+    const data = await response.json();
+    if (!response.ok) {
+        return "error";
+    }
+    let polls: Poll[] = [];
+    for (const key in data) {
+        let pollObject: Poll =
+        {
+            questions: data[key]["questions"],
+            id: key,
+            title: data[key]["title"],
+            status: data[key]["status"],
+        }
+        polls.push(pollObject);
+    }
+    return polls;
+
+}

@@ -48,7 +48,8 @@ const LoginPage: React.FC = (props) => {
             else {
                 authCtx.login(data.userDataObject);
                 toast.success("User Loggedin successfully");
-                navigate("/adminDashboard", { replace: true });
+                data.userDataObject.role === "Admin" ? navigate("/adminDashboard", { replace: true })
+                    : navigate("/userdashboard", { replace: true });
             }
         })
     };
