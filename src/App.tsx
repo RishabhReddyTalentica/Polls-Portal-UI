@@ -12,6 +12,7 @@ import { useDispatch } from 'react-redux';
 import { fetchPollData } from './store/polls-actions';
 import UserDashboard from './components/UserDashboard/UserDashboard';
 import UserPollForm from './components/UserPollForm/UserPollForm';
+import ClosedPoll from './components/ClosedPoll/ClosedPoll';
 
 function App() {
   const authCtx = useContext(AuthContext);
@@ -33,6 +34,8 @@ function App() {
             <Route path="/createnewpoll" element={<CreatePoll />} />}
           {authCtx.userData?.role === "Admin" &&
             <Route path="/openpoll/:pollId" element={<CreatePoll />} />}
+          {authCtx.userData?.role === "Admin" &&
+            <Route path="/closedpoll/:pollId" element={<ClosedPoll />} />}
           {authCtx.userData?.role !== "Admin" &&
             <Route path="/userpollform/:pollId" element={<UserPollForm />} />}
           <Route path="*" element={<Navigate to='/' replace />} />

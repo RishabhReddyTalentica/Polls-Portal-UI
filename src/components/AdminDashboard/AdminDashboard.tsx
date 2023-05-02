@@ -1,6 +1,6 @@
 import { Container, Row, Col } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux/es/hooks/useSelector";
+import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { Poll } from "../../models/Poll";
 
@@ -33,6 +33,7 @@ const AdminDashboard: React.FC = (props) => {
                                     {storePoll.title}
                                 </Link>
                             }
+                            return ""
                         })}
                     </Row>
                 </Col>
@@ -43,10 +44,15 @@ const AdminDashboard: React.FC = (props) => {
                     <Row style={{ maxHeight: "50vh", overflowY: "scroll" }}>
                         {storePolls.map((storePoll: Poll) => {
                             if (storePoll.status === "closed") {
-                                return <Link key={storePoll.id} to={`/`} replace={true} style={{ marginTop: "10px" }}>
+                                return <Link key={storePoll.id} to={`/closedpoll/${storePoll.id}`} replace={true} style={{ marginTop: "10px" }}
+                                    state={{
+                                        mode: 'VIEW',
+                                        pollData: storePoll,
+                                    }}>
                                     {storePoll.title}
                                 </Link>
                             }
+                            return ""
                         })}
                     </Row>
                 </Col>

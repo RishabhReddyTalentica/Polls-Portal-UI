@@ -47,6 +47,12 @@ const CreatePoll: React.FC = (props) => {
         setPollQuestions(questions);
     }
 
+    const onRemoveOptionHandler = (optionIndex: number, questionIndex: number, event: any) => {
+        const questions = [...pollQuestions];
+        questions[questionIndex].options.splice(optionIndex, 1);
+        setPollQuestions(questions);
+    }
+
     const onPollSubmitHandler = async (event: any) => {
         event.preventDefault();
         setShowLoader(true);
@@ -57,7 +63,12 @@ const CreatePoll: React.FC = (props) => {
             return;
         }
         else if (pollTitle.trim().length !== 0) {
-            await pollQuestions.forEach((question, index) => {
+            if (pollQuestions.length === 0) {
+                toast.info("Poll must contain atleast one question");
+                setShowLoader(false);
+                return;
+            }
+            pollQuestions.forEach((question, index) => {
                 if (question.label.trim().length === 0) {
                     toast.info(`Please enter question ${index + 1}`);
                     setShowLoader(false);
@@ -122,8 +133,6 @@ const CreatePoll: React.FC = (props) => {
     }
 
     useEffect(() => {
-
-        console.log(location.pathname);
         if (location.state === null && location.pathname.includes("openpoll")) {
             navigate("/adminDashboard", { replace: true });
         }
@@ -134,7 +143,7 @@ const CreatePoll: React.FC = (props) => {
                 setCanEdit(false);
             }
         }
-    }, []);
+    }, [navigate, location]);
 
     return (
         <Container>
@@ -179,6 +188,7 @@ const CreatePoll: React.FC = (props) => {
                                                         <Form.Label>
                                                             <strong><span style={{ color: "red" }}>*</span> {`Q)${index + 1}`}</strong>
                                                         </Form.Label>
+
                                                         <Form.Control type="text" placeholder="Enter question" defaultValue={question.label}
                                                             onChange={(event) => { onQuestionLabelChangeHandler(index, event) }} disabled={!canEdit}
                                                         />
@@ -192,11 +202,17 @@ const CreatePoll: React.FC = (props) => {
                                                     <Row>
                                                         {question.options.map((option, i) => {
                                                             return (
-                                                                <Row key={i}>
-                                                                    <Col xs={12} sm={12} md={6} lg={6} xl={6} xxl={6} style={{ marginTop: "10px" }}>
+                                                                <Row key={index + i}>
+                                                                    <Col xs={10} sm={10} md={6} lg={6} xl={6} xxl={6} style={{ marginTop: "10px" }}>
                                                                         <Form.Control type="text" placeholder={`Enter option ${i + 1}`} value={option} onChange={(e) => { onChangeOptionHandler(i, index, e) }}
                                                                             disabled={!canEdit} />
                                                                     </Col>
+                                                                    {i !== 0 && i !== 1 && canEdit ? <Col xs={2} sm={2} md={6} lg={6} xl={6} xxl={6} style={{ marginTop: "10px" }}>
+                                                                        <Button variant="outline-danger" type="button" onClick={(e) => { onRemoveOptionHandler(i, index, e) }}>
+                                                                            X
+                                                                        </Button>
+                                                                    </Col> : ""}
+
                                                                 </Row>
                                                             );
                                                         })}

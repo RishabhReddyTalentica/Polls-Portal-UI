@@ -8,6 +8,7 @@ export const fetchPollData = (): ThunkAction<void, RootState, unknown, AnyAction
     return async (dispatch) => {
         try {
             const pollsData = await fetchAllPolls();
+            console.log("storePolls", pollsData);
             dispatch(
                 pollsActions.updatePolls(pollsData)
             );

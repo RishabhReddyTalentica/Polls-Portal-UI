@@ -122,6 +122,21 @@ export async function fetchUserSubmittedPolls(userId: any) {
     return submittedPolls;
 }
 
+export async function fetchClosedPolls(pollId: any) {
+    const response = await fetch(`${FIREBASE_DOMAIN}/UsersPollsSubmitted.json`);
+    const data = await response.json();
+    if (!response.ok) {
+        return "error";
+    }
+    let closedPolls: any[] = [];
+    for (const key in data) {
+        if (data[key]["poll"] === pollId) {
+            closedPolls.push(data[key]);
+        }
+    }
+    return closedPolls;
+}
+
 export async function fetchAllPolls(): Promise<Poll[] | string> {
     const response = await fetch(`${FIREBASE_DOMAIN}/Polls.json`);
     const data = await response.json();
@@ -133,7 +148,7 @@ export async function fetchAllPolls(): Promise<Poll[] | string> {
         let pollObject: Poll =
         {
             questions: data[key]["questions"],
-            id: key,
+            id: data[key].id ? data[key].id : key,
             title: data[key]["title"],
             status: data[key]["status"],
         }

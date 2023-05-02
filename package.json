@@ -12,8 +12,10 @@
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "bootstrap": "^5.2.3",
+    "chart.js": "^4.3.0",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.4",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^8.0.5",
     "react-router-dom": "^6.10.0",
@@ -47,5 +49,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "react-test-renderer": "^18.2.0"
   }
 }

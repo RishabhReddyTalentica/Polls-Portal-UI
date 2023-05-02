@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Container, Row, Col, Card, Form, Button, Navbar } from "react-bootstrap";
+import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Question } from "../../models/Question";
 import { toast } from "react-toastify";
@@ -70,7 +70,7 @@ const UserPollForm: React.FC = (props) => {
         else {
             if (location.state && location.state.pollData && location.pathname.includes("userpollform") && location.state.mode === "NEW") {
                 let optionsSelected: any[] = [];
-                location.state.pollData.questions.map(() => {
+                location.state.pollData.questions.forEach(() => {
                     optionsSelected.push(undefined);
                 })
                 setPollTitle(location.state.pollData.title);
@@ -80,7 +80,7 @@ const UserPollForm: React.FC = (props) => {
             }
             else if (location.state && location.state.pollData && location.pathname.includes("userpollform") && location.state.mode === "VIEW") {
                 let optionsSelected: any[] = [];
-                location.state.pollData.questions.map(() => {
+                location.state.pollData.questions.forEach(() => {
                     optionsSelected.push(undefined);
                 })
                 setPollTitle(location.state.pollData.title);
@@ -89,7 +89,7 @@ const UserPollForm: React.FC = (props) => {
                 setSelectedOptions(optionsSelected);
             }
         }
-    }, []);
+    }, [location, navigate]);
     return (
         <Container>
             {showLoader && <Loader />}
