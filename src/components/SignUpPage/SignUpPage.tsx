@@ -1,11 +1,53 @@
 import { useRef, useState } from "react";
 import { Card, Container, Row, Col, Form, Button } from "react-bootstrap";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { UserData } from "../../models/UserData";
 import { userSignUp } from "../../services/api";
 import Loader from "../Loader/Loader";
+import LinkComponent from "../LinkComponent/LinkComponent";
+import FormGroupComponent from "../FormGroupComponent/FormGroupComponent";
 
+
+
+export const validation = (value: string, type: string, inputName: string, pattern?: any) => {
+    if (type === "email" || type === "password") {
+        if (value.trim().length === 0) {
+            toast.info(`Please enter ${inputName}`)
+            return false;
+        }
+        else if (pattern && pattern.test(value) === false) {
+            if (type === "password") {
+                toast.info("Password must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters");
+            }
+            else {
+                toast.info(`Please enter a valid ${inputName}`);
+            }
+
+            return false;
+        }
+        else if (type === "email" && value.includes("@talentica.com") === false) {
+            toast.info(`Please enter talentica email id`);
+            return false;
+        }
+    }
+    else {
+        if (type === "dropdown" && inputName === "role") {
+            if (value === "" || value === "role") {
+                toast.info(`Please select ${inputName}`);
+                return false;
+            }
+        }
+        else {
+            if (value.trim().length === 0) {
+                toast.info(`Please enter ${inputName}`)
+                return false;
+            }
+        }
+
+    }
+    return true;
+}
 
 const SignUpPage: React.FC = (props) => {
     const emailInputRef = useRef<HTMLInputElement>(null);
@@ -34,36 +76,12 @@ const SignUpPage: React.FC = (props) => {
         const passwordPattern = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/;
         const emailPattern = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{1,63}$/;
 
-        if (enteredEmail.trim().length === 0) {
-            toast.info("Please enter email id");
-            setShowLoader(false);
-            return;
-        } else if (emailPattern.test(enteredEmail) === false) {
-            toast.info("Please enter a valid email id");
-            setShowLoader(false);
-            return;
-        } else if (enteredEmail.includes("@talentica.com") === false) {
-            toast.info("Please enter Talentica email id");
-            setShowLoader(false);
-            return;
-        } else if (enteredPassword.trim().length === 0) {
-            toast.info("Please enter password");
-            setShowLoader(false);
-            return;
-        } else if (passwordPattern.test(enteredPassword) === false) {
-            toast.info("Password must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters");
-            setShowLoader(false);
-            return;
-        } else if (enteredFirstName.trim().length === 0) {
-            toast.info("Please enter first name");
-            setShowLoader(false);
-            return;
-        } else if (enteredLastName.trim().length === 0) {
-            toast.info("Please enter last name");
-            setShowLoader(false);
-            return;
-        } else if (enteredRole === "" || enteredRole === "role") {
-            toast.info("Please select role");
+        if (validation(enteredEmail, "email", "email id", emailPattern) === false ||
+            validation(enteredPassword, "password", "password", passwordPattern) === false ||
+            validation(enteredFirstName, "text", "first name") === false ||
+            validation(enteredLastName, "text", "last name") === false ||
+            validation(enteredRole, "dropdown", "role") === false
+        ) {
             setShowLoader(false);
             return;
         }
@@ -104,65 +122,17 @@ const SignUpPage: React.FC = (props) => {
                         <Col md={2}></Col>
                         <Col md={8}>
                             <Form onSubmit={formSubmitHandler}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label htmlFor="email">
-                                        <strong>
-                                            <span style={{ color: "red" }}>
-                                                *
-                                            </span> Email address
-                                        </strong>
-                                    </Form.Label>
-                                    <Form.Control type="email" id="email" placeholder="Enter email" ref={emailInputRef} />
-                                </Form.Group>
-                                <Form.Group className="mb-3">
-                                    <Form.Label htmlFor="password">
-                                        <strong>
-                                            <span style={{ color: "red" }}>
-                                                *
-                                            </span> Password
-                                        </strong>
-                                    </Form.Label>
-                                    <Form.Control type="password" id="password" placeholder="Enter password" ref={passwordInputRef} />
-                                </Form.Group>
-                                <Form.Group className="mb-3">
-                                    <Form.Label htmlFor="firstName">
-                                        <strong>
-                                            <span style={{ color: "red" }}>
-                                                *
-                                            </span> First Name
-                                        </strong>
-                                    </Form.Label>
-                                    <Form.Control type="text" id="firstName" placeholder="Enter first name" ref={firstNameInputRef} />
-                                </Form.Group>
-                                <Form.Group className="mb-3">
-                                    <Form.Label htmlFor="lastName">
-                                        <strong>
-                                            <span style={{ color: "red" }}>
-                                                *
-                                            </span> Last Name
-                                        </strong>
-                                    </Form.Label>
-                                    <Form.Control type="text" id="lastName" placeholder="Enter last name" ref={lastNameInputRef} />
-                                </Form.Group>
-                                <Form.Group className="mb-3">
-                                    <Form.Label htmlFor="role">
-                                        <strong>
-                                            <span style={{ color: "red" }}>
-                                                *
-                                            </span> Role
-                                        </strong>
-                                    </Form.Label>
-                                    <Form.Select id="role" onChange={changeRoleHandler}>
-                                        <option value="role">--- select role ---</option>
-                                        <option value="Admin">Admin</option>
-                                        <option value="User">User</option>
-                                    </Form.Select>
-                                </Form.Group>
+                                <FormGroupComponent type="email" id="email" placeholder="Enter email" label="Email address" ref={emailInputRef} />
+                                <FormGroupComponent type="password" id="password" placeholder="Enter password" label="Password" ref={passwordInputRef} />
+                                <FormGroupComponent type="text" id="firstName" placeholder="Enter first name" label="First Name" ref={firstNameInputRef} />
+                                <FormGroupComponent type="text" id="lastName" placeholder="Enter last name" label="Last Name" ref={lastNameInputRef} />
+                                <FormGroupComponent type="dropdown" id="role" placeholder="--- select role ---" label="Role" onChange={changeRoleHandler} />
+
                                 <Row className="mb-3 align-items-center">
                                     <Col xs={3} sm={3} md={3} lg={3} xl={3} xxl={3} className="text-start">
-                                        <Link to={"/"} className="btn btn-outline-primary" replace={true}>
+                                        <LinkComponent to={"/"} className="btn btn-outline-primary" state={null}>
                                             Cancel
-                                        </Link>
+                                        </LinkComponent>
                                     </Col>
                                     <Col xs={5} sm={5} md={5} lg={5} xl={5} xxl={5}></Col>
                                     <Col xs={3} sm={3} md={3} lg={3} xl={3} xxl={3} className="text-end">

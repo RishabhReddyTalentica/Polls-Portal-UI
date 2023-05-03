@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { Question } from "../../models/Question";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { fetchClosedPolls } from "../../services/api";
 import Loader from "../Loader/Loader";
 import { Container, Row, Col, Card, Form } from "react-bootstrap";
 import ChartComponent from "../ChartComponent/ChartComponent";
+import LinkComponent from "../LinkComponent/LinkComponent";
 
 
 
@@ -20,7 +21,7 @@ const ClosedPoll: React.FC = (props) => {
 
     useEffect(() => {
         if (location.state === null && location.pathname.includes("closedpoll")) {
-            navigate("/adminDashboard", { replace: true });
+            navigate("/admindashboard", { replace: true });
         }
         else {
             let sampleData: any[] = [];
@@ -103,9 +104,9 @@ const ClosedPoll: React.FC = (props) => {
 
                                 <Row className="mb-3 align-items-center">
                                     <Col xs={12} sm={12} md={12} lg={12} xl={12} xxl={12} className="text-start">
-                                        <Link to={"/adminDashboard"} className="btn btn-outline-primary" replace={true}>
+                                        <LinkComponent to={"/admindashboard"} className="btn btn-outline-primary" state={null}>
                                             Go Back
-                                        </Link>
+                                        </LinkComponent>
                                     </Col>
                                     {/*<Col xs={5} sm={5} md={5} lg={5} xl={5} xxl={5}></Col> */}
                                     <Col xs={12} sm={12} md={12} lg={12} xl={12} xxl={12} className="text-end">

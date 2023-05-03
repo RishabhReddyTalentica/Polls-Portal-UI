@@ -18,36 +18,44 @@ function App() {
   const authCtx = useContext(AuthContext);
   const dispatch = useDispatch<any>();
 
+  const routes =
+    authCtx.isLoggedIn ?
+      authCtx.userData?.role === "Admin" ?
+        [
+          { path: "/", component: <DashboardLayout><AdminDashboard /></DashboardLayout> },
+          { path: "/admindashboard", component: <DashboardLayout><AdminDashboard /></DashboardLayout> },
+          { path: "/createnewpoll", component: <CreatePoll /> },
+          { path: "/openpoll/:pollId", component: <CreatePoll /> },
+          { path: "/closedpoll/:pollId", component: <ClosedPoll /> },
+          { path: "*", component: <Navigate to='/' replace /> },
+
+        ]
+        :
+        [
+          { path: "/", component: <DashboardLayout><UserDashboard /></DashboardLayout> },
+          { path: "/userdashboard", component: <DashboardLayout><UserDashboard /></DashboardLayout> },
+          { path: "/userpollform/:pollId", component: <UserPollForm /> },
+          { path: "*", component: <Navigate to='/' replace /> },
+        ]
+      :
+      [
+        { path: "/", component: <LoginPage /> },
+        { path: "/login", component: <LoginPage /> },
+        { path: "/signup", component: <SignUpPage /> },
+        { path: "*", component: <Navigate to='/' replace /> },
+      ]
+    ;
   useEffect(() => {
     dispatch(fetchPollData())
-  }, [])
+  }, [dispatch])
+
   return (
     <MainHeader>
-      {authCtx.isLoggedIn ?
-        <Routes>
-          <Route path="/" element={<DashboardLayout>{authCtx.userData?.role === "Admin" ? <AdminDashboard /> : <UserDashboard />}</DashboardLayout>} />
-          {authCtx.userData?.role === "Admin" &&
-            <Route path="/adminDashboard" element={<DashboardLayout><AdminDashboard /></DashboardLayout>} />}
-          {authCtx.userData?.role !== "Admin" &&
-            <Route path="/userdashboard" element={<DashboardLayout><UserDashboard /></DashboardLayout>} />}
-          {authCtx.userData?.role === "Admin" &&
-            <Route path="/createnewpoll" element={<CreatePoll />} />}
-          {authCtx.userData?.role === "Admin" &&
-            <Route path="/openpoll/:pollId" element={<CreatePoll />} />}
-          {authCtx.userData?.role === "Admin" &&
-            <Route path="/closedpoll/:pollId" element={<ClosedPoll />} />}
-          {authCtx.userData?.role !== "Admin" &&
-            <Route path="/userpollform/:pollId" element={<UserPollForm />} />}
-          <Route path="*" element={<Navigate to='/' replace />} />
-        </Routes>
-        :
-        <Routes>
-          <Route path="/" element={<LoginPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignUpPage />} />
-          <Route path="*" element={<Navigate to='/' replace />} />
-        </Routes>
-      }
+      <Routes>
+        {routes.map((route, index) => {
+          return (<Route key={index} path={route.path} element={route.component} />)
+        })}
+      </Routes>
 
     </MainHeader>
   );

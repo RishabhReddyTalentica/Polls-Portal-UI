@@ -1,11 +1,13 @@
 import { useContext, useEffect, useState } from "react";
 import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Question } from "../../models/Question";
 import { toast } from "react-toastify";
 import AuthContext from "../../store/user-context";
 import { userPollSubmitted } from "../../services/api";
 import Loader from "../Loader/Loader";
+import LinkComponent from "../LinkComponent/LinkComponent";
+import UserPollQuestionComponent from "../UserPollQuestionComponent/UserPollQuestionComponent";
 
 
 const UserPollForm: React.FC = (props) => {
@@ -109,47 +111,7 @@ const UserPollForm: React.FC = (props) => {
                                     <Col xs={12} sm={12} md={12} lg={12} xl={12} xxl={12}>
                                         {pollQuestions.map((question, index) => {
                                             return (
-                                                <Row key={index}>
-                                                    <Col xs={12} sm={12} md={9} lg={9} xl={9} xxl={9} >
-                                                        <Form.Label>
-                                                            <strong><span style={{ color: "red" }}>*</span> {`Q)${index + 1} ${question.label}`}</strong>
-                                                        </Form.Label>
-                                                    </Col>
-                                                    <Row>
-                                                        {question.options.map((option, i) => {
-                                                            return (
-                                                                <Row key={i}>
-                                                                    <Col xs={12} sm={12} md={6} lg={6} xl={6} xxl={6} style={{ marginTop: "10px" }}>
-                                                                        {
-                                                                            canEdit ?
-                                                                                <Form.Check
-                                                                                    type="radio"
-                                                                                    id={i.toString()}
-                                                                                    label={option}
-                                                                                    name={index.toString()}
-                                                                                    onChange={(e) => { onChangeOptionHandler(i, index, e) }}
-                                                                                    disabled={!canEdit}
-                                                                                /> :
-                                                                                <Form.Check
-                                                                                    type="radio"
-                                                                                    id={i.toString()}
-                                                                                    label={option}
-                                                                                    name={index.toString()}
-                                                                                    //onChange={(e) => { onChangeOptionHandler(i, index, e) }}
-                                                                                    disabled={!canEdit}
-                                                                                    defaultChecked={onCheckSelected(i, index)}
-                                                                                />
-                                                                        }
-
-                                                                    </Col>
-                                                                </Row>
-                                                            );
-                                                        })}
-                                                    </Row>
-
-                                                    <Row style={{ marginTop: "20px" }}></Row>
-
-                                                </Row>
+                                                <UserPollQuestionComponent key={index} index={index} question={question} canEdit={canEdit} onChangeOptionHandler={onChangeOptionHandler} onCheckSelected={onCheckSelected} />
                                             )
 
                                         })}
@@ -160,11 +122,10 @@ const UserPollForm: React.FC = (props) => {
 
                                 <Row className="mb-3 align-items-center">
                                     <Col xs={12} sm={12} md={12} lg={12} xl={12} xxl={12} className="text-start">
-                                        <Link to={"/userdashboard"} className="btn btn-outline-primary" replace={true}>
+                                        <LinkComponent to={"/userdashboard"} className="btn btn-outline-primary" state={null}>
                                             Cancel
-                                        </Link>
+                                        </LinkComponent>
                                     </Col>
-                                    {/*<Col xs={5} sm={5} md={5} lg={5} xl={5} xxl={5}></Col> */}
                                     <Col xs={12} sm={12} md={12} lg={12} xl={12} xxl={12} className="text-end">
                                         {canEdit && <Button variant="outline-primary" type="submit">
                                             Submit Poll

@@ -1,5 +1,4 @@
 import { Container, Row, Col } from "react-bootstrap";
-import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { Poll } from "../../models/Poll";
@@ -7,6 +6,7 @@ import { fetchUserSubmittedPolls } from "../../services/api";
 import { useContext, useEffect, useState } from "react";
 import AuthContext from "../../store/user-context";
 import Loader from "../Loader/Loader";
+import LinkComponent from "../LinkComponent/LinkComponent";
 
 
 const UserDashboard: React.FC = (props) => {
@@ -37,13 +37,13 @@ const UserDashboard: React.FC = (props) => {
                     <Row style={{ maxHeight: "50vh", overflowY: "scroll" }}>
                         {storePolls.map((storePoll: Poll) => {
                             if (storePoll.status === "online" && (filledPolls.findIndex((filledPoll: any) => { return filledPoll.poll === storePoll.id })) === -1) {
-                                return <Link key={storePoll.id} to={`/userpollform/${storePoll.id}`} replace={true} style={{ marginTop: "10px" }}
+                                return <LinkComponent key={storePoll.id} to={`/userpollform/${storePoll.id}`} style={{ marginTop: "10px" }}
                                     state={{
                                         mode: 'NEW',
                                         pollData: storePoll,
                                     }}>
                                     {storePoll.title}
-                                </Link>
+                                </LinkComponent>
                             }
                             return "";
                         })}
@@ -56,14 +56,14 @@ const UserDashboard: React.FC = (props) => {
                     <Row style={{ maxHeight: "50vh", overflowY: "scroll" }}>
                         {storePolls.map((storePoll: Poll) => {
                             if (storePoll.status === "online" && (filledPolls.findIndex((filledPoll: any) => { return filledPoll.poll === storePoll.id })) !== -1) {
-                                return <Link key={storePoll.id} to={`/userpollform/${storePoll.id}`} replace={true} style={{ marginTop: "10px" }}
+                                return <LinkComponent key={storePoll.id} to={`/userpollform/${storePoll.id}`} style={{ marginTop: "10px" }}
                                     state={{
                                         mode: 'VIEW',
                                         pollData: storePoll,
                                         filledData: filledPolls.filter((filledPoll: any) => filledPoll.poll === storePoll.id)
                                     }}>
                                     {storePoll.title}
-                                </Link>
+                                </LinkComponent>
                             }
                             return "";
                         })}

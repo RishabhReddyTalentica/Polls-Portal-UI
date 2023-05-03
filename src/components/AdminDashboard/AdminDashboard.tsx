@@ -1,8 +1,8 @@
 import { Container, Row, Col } from "react-bootstrap";
-import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { Poll } from "../../models/Poll";
+import LinkComponent from "../LinkComponent/LinkComponent";
 
 
 const AdminDashboard: React.FC = (props) => {
@@ -11,9 +11,9 @@ const AdminDashboard: React.FC = (props) => {
         <Container>
             <Row>
                 <Col className="text-center">
-                    <Link to={"/createnewpoll"} className="btn btn-outline-primary" replace={true}>
+                    <LinkComponent to={"/createnewpoll"} className="btn btn-outline-primary" state={null}>
                         Create new poll
-                    </Link>
+                    </LinkComponent>
                 </Col>
             </Row>
             <Row style={{ columnGap: "20px" }}>
@@ -25,13 +25,13 @@ const AdminDashboard: React.FC = (props) => {
                     <Row style={{ maxHeight: "50vh", overflowY: "scroll" }}>
                         {storePolls.map((storePoll: Poll) => {
                             if (storePoll.status === "online") {
-                                return <Link key={storePoll.id} to={`/openpoll/${storePoll.id}`} replace={true} style={{ marginTop: "10px" }}
+                                return <LinkComponent key={storePoll.id} to={`/openpoll/${storePoll.id}`} style={{ marginTop: "10px" }}
                                     state={{
                                         mode: 'VIEW',
                                         pollData: storePoll,
                                     }}>
                                     {storePoll.title}
-                                </Link>
+                                </LinkComponent>
                             }
                             return ""
                         })}
@@ -44,13 +44,13 @@ const AdminDashboard: React.FC = (props) => {
                     <Row style={{ maxHeight: "50vh", overflowY: "scroll" }}>
                         {storePolls.map((storePoll: Poll) => {
                             if (storePoll.status === "closed") {
-                                return <Link key={storePoll.id} to={`/closedpoll/${storePoll.id}`} replace={true} style={{ marginTop: "10px" }}
+                                return <LinkComponent key={storePoll.id} to={`/closedpoll/${storePoll.id}`} style={{ marginTop: "10px" }}
                                     state={{
                                         mode: 'VIEW',
                                         pollData: storePoll,
                                     }}>
                                     {storePoll.title}
-                                </Link>
+                                </LinkComponent>
                             }
                             return ""
                         })}

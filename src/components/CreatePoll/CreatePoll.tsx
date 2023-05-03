@@ -4,10 +4,14 @@ import { Question } from "../../models/Question";
 import { toast } from "react-toastify";
 import { Poll } from "../../models/Poll";
 import { createPoll, updatePoll } from "../../services/api";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Loader from "../Loader/Loader";
 import { useDispatch } from "react-redux";
 import { fetchPollData } from "../../store/polls-actions";
+import LinkComponent from "../LinkComponent/LinkComponent";
+import CreatePollQuestionComponent from "../CreatePollQuestionComponent/CreatePollQuestionComponent";
+import { validation } from "../SignUpPage/SignUpPage";
+import FormGroupComponentWithoutRef from "../FormGroupComponentWithoutRef/FormGroupComponentWithoutRef";
 
 
 
@@ -57,38 +61,31 @@ const CreatePoll: React.FC = (props) => {
         event.preventDefault();
         setShowLoader(true);
         let error: boolean = false;
-        if (pollTitle.trim().length === 0) {
-            toast.info("Please enter poll name");
+
+        if (validation(pollTitle, "text", "poll name") === false) {
             setShowLoader(false);
             return;
         }
-        else if (pollTitle.trim().length !== 0) {
-            if (pollQuestions.length === 0) {
-                toast.info("Poll must contain atleast one question");
-                setShowLoader(false);
-                return;
-            }
+        else {
             pollQuestions.forEach((question, index) => {
-                if (question.label.trim().length === 0) {
-                    toast.info(`Please enter question ${index + 1}`);
+                if (validation(question.label, "text", `question ${index + 1}`) === false) {
                     setShowLoader(false);
                     error = true;
                     return;
                 }
                 else {
                     question.options.forEach((option, i) => {
-                        if (option.trim().length === 0) {
-                            toast.info(`Please enter question ${index + 1}'s option ${i + 1}`);
+                        if (validation(option, "text", `question ${index + 1}'s option ${i + 1}`) === false) {
                             setShowLoader(false);
                             error = true;
                             return;
                         }
                     })
+
                 }
-
-            });
-
+            })
         }
+
         if (error === false) {
 
             let pollSubmitObject: Poll = {
@@ -104,7 +101,7 @@ const CreatePoll: React.FC = (props) => {
                 else {
                     toast.success("Poll created successfully");
                     dispatch(fetchPollData());
-                    navigate("/adminDashboard", { replace: true });
+                    navigate("/admindashboard", { replace: true });
                 }
             });
         }
@@ -127,14 +124,14 @@ const CreatePoll: React.FC = (props) => {
             else {
                 toast.success("Poll updated successfully");
                 dispatch(fetchPollData());
-                navigate("/adminDashboard", { replace: true });
+                navigate("/admindashboard", { replace: true });
             }
         })
     }
 
     useEffect(() => {
         if (location.state === null && location.pathname.includes("openpoll")) {
-            navigate("/adminDashboard", { replace: true });
+            navigate("/admindashboard", { replace: true });
         }
         else {
             if (location.state && location.state.pollData && location.pathname.includes("openpoll")) {
@@ -159,13 +156,8 @@ const CreatePoll: React.FC = (props) => {
                         <Col md={2}></Col>
                         <Col md={8}>
                             <Form>
-                                <Form.Group className="mb-3">
-                                    <Form.Label htmlFor="pollname">
-                                        <strong><span style={{ color: "red" }}>*</span> Poll Name</strong>
-                                    </Form.Label>
-                                    <Form.Control type="text" id="pollname" placeholder="Enter poll name" value={pollTitle}
-                                        onChange={onPollTitleChangeHandler} disabled={!canEdit} />
-                                </Form.Group>
+                                <FormGroupComponentWithoutRef type="text" id="pollname" label="Poll Name" placeholder="Enter poll name"
+                                    value={pollTitle} onChange={onPollTitleChangeHandler} disabled={!canEdit} />
 
                                 <Row className="mb-3 align-items-center">
                                     <Navbar sticky="top">
@@ -183,44 +175,7 @@ const CreatePoll: React.FC = (props) => {
                                     <Col xs={12} sm={12} md={12} lg={12} xl={12} xxl={12}>
                                         {pollQuestions.map((question, index) => {
                                             return (
-                                                <Row key={index}>
-                                                    <Col xs={12} sm={12} md={9} lg={9} xl={9} xxl={9} >
-                                                        <Form.Label>
-                                                            <strong><span style={{ color: "red" }}>*</span> {`Q)${index + 1}`}</strong>
-                                                        </Form.Label>
-
-                                                        <Form.Control type="text" placeholder="Enter question" defaultValue={question.label}
-                                                            onChange={(event) => { onQuestionLabelChangeHandler(index, event) }} disabled={!canEdit}
-                                                        />
-                                                    </Col>
-
-                                                    <Col xs={12} sm={12} md={3} lg={3} xl={3} xxl={3} className="text-end" style={{ marginTop: "20px" }}>
-                                                        {canEdit && <Button variant="outline-primary" type="button" onClick={(e) => { onAddNewOptionHandler(index) }}>
-                                                            Add Option
-                                                        </Button>}
-                                                    </Col>
-                                                    <Row>
-                                                        {question.options.map((option, i) => {
-                                                            return (
-                                                                <Row key={index + i}>
-                                                                    <Col xs={10} sm={10} md={6} lg={6} xl={6} xxl={6} style={{ marginTop: "10px" }}>
-                                                                        <Form.Control type="text" placeholder={`Enter option ${i + 1}`} value={option} onChange={(e) => { onChangeOptionHandler(i, index, e) }}
-                                                                            disabled={!canEdit} />
-                                                                    </Col>
-                                                                    {i !== 0 && i !== 1 && canEdit ? <Col xs={2} sm={2} md={6} lg={6} xl={6} xxl={6} style={{ marginTop: "10px" }}>
-                                                                        <Button variant="outline-danger" type="button" onClick={(e) => { onRemoveOptionHandler(i, index, e) }}>
-                                                                            X
-                                                                        </Button>
-                                                                    </Col> : ""}
-
-                                                                </Row>
-                                                            );
-                                                        })}
-                                                    </Row>
-
-                                                    <Row style={{ marginTop: "20px" }}></Row>
-
-                                                </Row>
+                                                <CreatePollQuestionComponent key={index} question={question} index={index} canEdit={canEdit} onQuestionLabelChange={onQuestionLabelChangeHandler} onAddNewOption={onAddNewOptionHandler} onChangeOptionLabel={onChangeOptionHandler} onRemoveOption={onRemoveOptionHandler} />
                                             )
 
                                         })}
@@ -231,11 +186,10 @@ const CreatePoll: React.FC = (props) => {
 
                                 <Row className="mb-3 align-items-center">
                                     <Col xs={12} sm={12} md={12} lg={12} xl={12} xxl={12} className="text-start">
-                                        <Link to={"/adminDashboard"} className="btn btn-outline-primary" replace={true}>
+                                        <LinkComponent to={"/admindashboard"} className="btn btn-outline-primary" state={null}>
                                             Cancel
-                                        </Link>
+                                        </LinkComponent>
                                     </Col>
-                                    {/*<Col xs={5} sm={5} md={5} lg={5} xl={5} xxl={5}></Col> */}
                                     <Col xs={12} sm={12} md={12} lg={12} xl={12} xxl={12} className="text-end">
                                         {canEdit && <Button variant="outline-primary" type="submit" onClick={onPollSubmitHandler}>
                                             Submit Poll
