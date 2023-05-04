@@ -1,29 +1,42 @@
-import { forwardRef } from "react";
+import React from "react";
+import { Component } from "react";
 import { Form } from "react-bootstrap";
 
 
-const FormGroupComponent = forwardRef<any, { type: string, id: string, placeholder: string, label: string, onChange?: any }>((props, ref) => {
+type FormGroupComponentProps = {
+    type: string,
+    id: string,
+    placeholder: string,
+    label: string,
+    onChange?: any
+}
 
-    return (
-        <Form.Group className="mb-3">
-            <Form.Label htmlFor={props.id}>
-                <strong>
-                    <span style={{ color: "red" }}>*</span> {props.label}
-                </strong>
-            </Form.Label>
-            {props.type === "dropdown" ?
-                <Form.Select id={props.id} onChange={props.onChange}>
-                    <option value={props.id}>{props.placeholder}</option>
-                    <option value="Admin">Admin</option>
-                    <option value="User">User</option>
-                </Form.Select>
-                :
-                <Form.Control type={props.type} id={props.id} placeholder={props.placeholder} ref={ref} />
-            }
+class FormGroupComponent extends Component<FormGroupComponentProps, any>{
+    inputref = React.createRef<HTMLInputElement>();
+    getInput = () => {
+        return this.inputref.current?.value;
+    }
+    render() {
+        return (
+            <Form.Group className="mb-3">
+                <Form.Label htmlFor={this.props.id}>
+                    <strong>
+                        <span style={{ color: "red" }}>*</span> {this.props.label}
+                    </strong>
+                </Form.Label>
+                {this.props.type === "dropdown" ?
+                    <Form.Select id={this.props.id} onChange={this.props.onChange}>
+                        <option value={this.props.id}>{this.props.placeholder}</option>
+                        <option value="Admin">Admin</option>
+                        <option value="User">User</option>
+                    </Form.Select>
+                    :
+                    <Form.Control type={this.props.type} id={this.props.id} placeholder={this.props.placeholder} ref={this.inputref} />
+                }
 
-        </Form.Group>
-    )
-
-});
+            </Form.Group>
+        )
+    }
+}
 
 export default FormGroupComponent;

@@ -1,18 +1,24 @@
-import { ReactNode } from "react";
+import { Component, ReactNode } from "react";
 import { Link } from "react-router-dom";
 
 
+type LinkComponentProps = {
+    to: string,
+    style?: any,
+    state: any,
+    children: ReactNode,
+    className?: string
+}
+class LinkComponent extends Component<LinkComponentProps, any>{
 
-
-const LinkComponent: React.FC<{ to: string, style?: any, state: any, children: ReactNode, className?: string }> = (props) => {
-
-    return (
-        <Link to={props.to} replace={true} style={props.style ? props.style : {}}
-            state={props.state} className={props.className ? props.className : ``}>
-            {props.children}
-        </Link>
-    )
-
+    render() {
+        return (
+            <Link to={this.props.to} replace={true} style={this.props.style ? this.props.style : {}}
+                state={this.props.state} className={this.props.className ? this.props.className : ``}>
+                {this.props.children}
+            </Link>
+        )
+    }
 }
 
 export default LinkComponent;

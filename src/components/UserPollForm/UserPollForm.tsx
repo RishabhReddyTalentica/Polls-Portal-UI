@@ -1,6 +1,6 @@
-import { useContext, useEffect, useState } from "react";
+import { Component } from "react";
 import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { Question } from "../../models/Question";
 import { toast } from "react-toastify";
 import AuthContext from "../../store/user-context";
@@ -9,140 +9,145 @@ import Loader from "../Loader/Loader";
 import LinkComponent from "../LinkComponent/LinkComponent";
 import UserPollQuestionComponent from "../UserPollQuestionComponent/UserPollQuestionComponent";
 
-
-const UserPollForm: React.FC = (props) => {
-    const [pollTitle, setPollTitle] = useState<string>("");
-    const [pollQuestions, setPollQuestions] = useState<Question[]>([{ label: "", options: ["", ""] }]);
-    const [selectedOptions, setSelectedOptions] = useState<any[]>([]);
-    const [canEdit, setCanEdit] = useState<boolean>(true);
-    const [showLoader, setShowLoader] = useState<boolean>(false);
-    const navigate = useNavigate();
-    const location = useLocation();
-    const authCtx = useContext(AuthContext);
-
-    const onChangeOptionHandler = (optionIndex: number, questionIndex: number, event: any) => {
-        const selected = [...selectedOptions];
+type UserPollFormProps = {};
+type UserPollFormState = {
+    pollTitle: string,
+    pollQuestions: Question[],
+    selectedOptions: any[],
+    canEdit: boolean,
+    showLoader: boolean
+}
+class UserPollForm extends Component<UserPollFormProps, UserPollFormState>{
+    static contextType: React.Context<any> = AuthContext;
+    context!: React.ContextType<typeof AuthContext>;
+    constructor(props: UserPollFormProps) {
+        super(props);
+        this.state = {
+            pollTitle: "",
+            pollQuestions: [{ label: "", options: ["", ""] }],
+            selectedOptions: [],
+            canEdit: true,
+            showLoader: false
+        }
+    }
+    onChangeOptionHandler = (optionIndex: number, questionIndex: number, event: any) => {
+        const selected = [...this.state.selectedOptions];
         selected[questionIndex] = optionIndex;
-        setSelectedOptions(selected);
+        this.setState({ selectedOptions: selected });
     }
 
-    const onCheckSelected = (optionIndex: number, questionIndex: number) => {
-
-        if (location.state.filledData[0].selectedOptions[questionIndex] === optionIndex) {
+    onCheckSelected = (optionIndex: number, questionIndex: number) => {
+        if (window.history.state.usr.filledData[0].selectedOptions[questionIndex] === optionIndex) {
             return true;
         }
         return false;
     }
 
-    const onFormSubmitHandler = (event: any) => {
+    onFormSubmitHandler = (event: any) => {
         event.preventDefault();
-        setShowLoader(true);
-        let value = selectedOptions.findIndex((option: any) => option === undefined);
+        this.setState({ showLoader: true });
+        let value = this.state.selectedOptions.findIndex((option: any) => option === undefined);
         if (value !== -1) {
-            setShowLoader(false);
+            this.setState({ showLoader: false });
             toast.info("please answer all questions");
             return;
         }
         else {
             let submitObject: any = {
-                poll: location.state.pollData.id,
-                user: authCtx.userData?.id,
-                selectedOptions
+                poll: window.history.state.usr.pollData.id,
+                user: this.context.userData?.id,
+                selectedOptions: this.state.selectedOptions
             }
             userPollSubmitted(submitObject).then((data) => {
-                setShowLoader(false);
+                this.setState({ showLoader: false });
                 if (data === "error") {
                     toast.error("Error occured unable to submit poll");
                 }
                 else {
                     toast.success("Poll successfully submitted");
-                    navigate("/userdashboard", { replace: true })
+                    <Navigate to="/userdashboard" replace={true} />
                 }
 
             })
         }
-
-
     }
-
-    useEffect(() => {
-        if (location.state === null && location.pathname.includes("userpollform")) {
-            navigate("/userdashboard", { replace: true });
+    componentDidMount() {
+        if (window.history.state.usr === undefined) {
+            <Navigate to="/" replace={true} />
         }
         else {
-            if (location.state && location.state.pollData && location.pathname.includes("userpollform") && location.state.mode === "NEW") {
+            if (window.history.state.usr && window.history.state.usr.pollData && window.location.pathname.includes("userpollform") && window.history.state.usr.mode === "NEW") {
                 let optionsSelected: any[] = [];
-                location.state.pollData.questions.forEach(() => {
+                window.history.state.usr.pollData.questions.forEach(() => {
                     optionsSelected.push(undefined);
                 })
-                setPollTitle(location.state.pollData.title);
-                setPollQuestions(location.state.pollData.questions);
-                setCanEdit(true);
-                setSelectedOptions(optionsSelected);
+                this.setState({ pollTitle: window.history.state.usr.pollData.title, pollQuestions: window.history.state.usr.pollData.questions, canEdit: true, selectedOptions: optionsSelected })
+
             }
-            else if (location.state && location.state.pollData && location.pathname.includes("userpollform") && location.state.mode === "VIEW") {
+            else if (window.history.state.usr && window.history.state.usr.pollData && window.location.pathname.includes("userpollform") && window.history.state.usr.mode === "VIEW") {
                 let optionsSelected: any[] = [];
-                location.state.pollData.questions.forEach(() => {
+                window.history.state.usr.pollData.questions.forEach(() => {
                     optionsSelected.push(undefined);
                 })
-                setPollTitle(location.state.pollData.title);
-                setPollQuestions(location.state.pollData.questions);
-                setCanEdit(false);
-                setSelectedOptions(optionsSelected);
+                this.setState({ pollTitle: window.history.state.usr.pollData.title, pollQuestions: window.history.state.usr.pollData.questions, canEdit: false, selectedOptions: optionsSelected })
             }
         }
-    }, [location, navigate]);
-    return (
-        <Container>
-            {showLoader && <Loader />}
-            <Card>
-                <Card.Body>
-                    <Card.Title>
-                        <h4 className={`text-center`}>
-                            <strong>{pollTitle}</strong>
-                        </h4>
-                    </Card.Title>
-                    <Row className="justify-content-center">
-                        <Col md={2}></Col>
-                        <Col md={8}>
-                            <Form onSubmit={onFormSubmitHandler}>
-                                <Row className="mb-3 align-items-center">
+    }
+    render() {
+        return (
+            <Container>
+                {this.state.showLoader && <Loader />}
+                <Card>
+                    <Card.Body>
+                        <Card.Title>
+                            <h4 className={`text-center`}>
+                                <strong>{this.state.pollTitle}</strong>
+                            </h4>
+                        </Card.Title>
+                        <Row className="justify-content-center">
+                            <Col md={2}></Col>
+                            <Col md={8}>
+                                <Form onSubmit={this.onFormSubmitHandler}>
+                                    <Row className="mb-3 align-items-center">
 
-                                    <Col xs={12} sm={12} md={12} lg={12} xl={12} xxl={12}>
-                                        {pollQuestions.map((question, index) => {
-                                            return (
-                                                <UserPollQuestionComponent key={index} index={index} question={question} canEdit={canEdit} onChangeOptionHandler={onChangeOptionHandler} onCheckSelected={onCheckSelected} />
-                                            )
+                                        <Col xs={12} sm={12} md={12} lg={12} xl={12} xxl={12}>
+                                            {this.state.pollQuestions.map((question, index) => {
+                                                return (
+                                                    <UserPollQuestionComponent key={index} index={index} question={question} canEdit={this.state.canEdit} onChangeOptionHandler={this.onChangeOptionHandler} onCheckSelected={this.onCheckSelected} />
+                                                )
 
-                                        })}
-                                    </Col>
+                                            })}
+                                        </Col>
 
-                                </Row>
+                                    </Row>
 
 
-                                <Row className="mb-3 align-items-center">
-                                    <Col xs={12} sm={12} md={12} lg={12} xl={12} xxl={12} className="text-start">
-                                        <LinkComponent to={"/userdashboard"} className="btn btn-outline-primary" state={null}>
-                                            Cancel
-                                        </LinkComponent>
-                                    </Col>
-                                    <Col xs={12} sm={12} md={12} lg={12} xl={12} xxl={12} className="text-end">
-                                        {canEdit && <Button variant="outline-primary" type="submit">
-                                            Submit Poll
-                                        </Button>}
-                                    </Col>
-                                </Row>
-                            </Form>
-                        </Col>
-                        <Col md={2}>
-                        </Col>
+                                    <Row className="mb-3 align-items-center">
+                                        <Col xs={12} sm={12} md={12} lg={12} xl={12} xxl={12} className="text-start">
+                                            <LinkComponent to={"/userdashboard"} className="btn btn-outline-primary" state={null}>
+                                                Cancel
+                                            </LinkComponent>
+                                        </Col>
+                                        <Col xs={12} sm={12} md={12} lg={12} xl={12} xxl={12} className="text-end">
+                                            {this.state.canEdit && <Button variant="outline-primary" type="submit">
+                                                Submit Poll
+                                            </Button>}
+                                        </Col>
+                                    </Row>
+                                </Form>
+                            </Col>
+                            <Col md={2}>
+                            </Col>
 
-                    </Row>
-                </Card.Body>
-            </Card>
-        </Container>
+                        </Row>
+                    </Card.Body>
+                </Card>
+            </Container>
 
-    );
+        );
+    }
+
 }
+
 
 export default UserPollForm;
