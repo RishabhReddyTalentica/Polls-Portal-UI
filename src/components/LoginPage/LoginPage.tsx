@@ -1,6 +1,5 @@
 import { Component } from "react";
 import { Card, Container, Row, Col, Form, Button } from "react-bootstrap";
-import { Navigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { userLogin } from "../../services/api";
 import AuthContext from "../../store/user-context";
@@ -9,19 +8,20 @@ import LinkComponent from "../LinkComponent/LinkComponent";
 import { validation } from "../SignUpPage/SignUpPage";
 import FormGroupComponent from "../FormGroupComponent/FormGroupComponent";
 import React from "react";
+import withRouter, { withRouterProps } from "../../services/withRouter";
 
 
 type LoginPageProps = {}
 type LoginPageState = {
     showLoader: boolean
 }
-class LoginPage extends Component<LoginPageProps, LoginPageState> {
+class LoginPage extends Component<LoginPageProps & withRouterProps, LoginPageState> {
     emailInputRef = React.createRef<any>();
     passwordInputRef = React.createRef<any>();
     static contextType: React.Context<any> = AuthContext;
     context!: React.ContextType<typeof AuthContext>;
 
-    constructor(props: LoginPageProps) {
+    constructor(props: LoginPageProps & withRouterProps) {
         super(props);
         this.state = {
             showLoader: false
@@ -55,9 +55,10 @@ class LoginPage extends Component<LoginPageProps, LoginPageState> {
                 this.context.login(data.userDataObject);
                 toast.success("User Loggedin successfully");
                 data.userDataObject.role === "Admin" ?
-                    <Navigate to="/admindashboard" replace={true} />
+                    this.props.navigate("/admindashboard", { replace: true })
                     :
-                    <Navigate to="/userdashboard" replace={true} />
+                    this.props.navigate("/userdashboard", { replace: true })
+
             }
         })
     };
@@ -106,4 +107,4 @@ class LoginPage extends Component<LoginPageProps, LoginPageState> {
 }
 
 
-export default LoginPage;
+export default withRouter(LoginPage);

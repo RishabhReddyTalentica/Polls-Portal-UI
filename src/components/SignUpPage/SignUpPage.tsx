@@ -1,6 +1,5 @@
 import { Component } from "react";
 import { Card, Container, Row, Col, Form, Button } from "react-bootstrap";
-import { Navigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { UserData } from "../../models/UserData";
 import { userSignUp } from "../../services/api";
@@ -8,6 +7,7 @@ import Loader from "../Loader/Loader";
 import LinkComponent from "../LinkComponent/LinkComponent";
 import FormGroupComponent from "../FormGroupComponent/FormGroupComponent";
 import React from "react";
+import withRouter, { withRouterProps } from "../../services/withRouter";
 
 
 
@@ -57,12 +57,12 @@ type SignUpPageState = {
     showLoader: boolean,
     role: string
 }
-class SignUpPage extends Component<SignUpPageProps, SignUpPageState> {
+class SignUpPage extends Component<SignUpPageProps & withRouterProps, SignUpPageState> {
     emailInputRef = React.createRef<any>();
     passwordInputRef = React.createRef<any>();
     firstNameInputRef = React.createRef<any>();
     lastNameInputRef = React.createRef<any>();
-    constructor(props: SignUpPageProps) {
+    constructor(props: SignUpPageProps & withRouterProps) {
         super(props);
         this.state = {
             showLoader: false,
@@ -114,7 +114,7 @@ class SignUpPage extends Component<SignUpPageProps, SignUpPageState> {
             }
             else {
                 toast.success("User created successfully");
-                <Navigate to='/login' replace={true} />
+                this.props.navigate("/login", { replace: true });
             }
         });
 
@@ -167,4 +167,4 @@ class SignUpPage extends Component<SignUpPageProps, SignUpPageState> {
 }
 
 
-export default SignUpPage;
+export default withRouter(SignUpPage);

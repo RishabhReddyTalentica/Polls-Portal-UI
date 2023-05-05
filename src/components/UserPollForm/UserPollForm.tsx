@@ -1,6 +1,5 @@
 import { Component } from "react";
 import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
-import { Navigate } from "react-router-dom";
 import { Question } from "../../models/Question";
 import { toast } from "react-toastify";
 import AuthContext from "../../store/user-context";
@@ -8,6 +7,7 @@ import { userPollSubmitted } from "../../services/api";
 import Loader from "../Loader/Loader";
 import LinkComponent from "../LinkComponent/LinkComponent";
 import UserPollQuestionComponent from "../UserPollQuestionComponent/UserPollQuestionComponent";
+import withRouter, { withRouterProps } from "../../services/withRouter";
 
 type UserPollFormProps = {};
 type UserPollFormState = {
@@ -17,10 +17,10 @@ type UserPollFormState = {
     canEdit: boolean,
     showLoader: boolean
 }
-class UserPollForm extends Component<UserPollFormProps, UserPollFormState>{
+class UserPollForm extends Component<UserPollFormProps & withRouterProps, UserPollFormState>{
     static contextType: React.Context<any> = AuthContext;
     context!: React.ContextType<typeof AuthContext>;
-    constructor(props: UserPollFormProps) {
+    constructor(props: UserPollFormProps & withRouterProps) {
         super(props);
         this.state = {
             pollTitle: "",
@@ -65,7 +65,7 @@ class UserPollForm extends Component<UserPollFormProps, UserPollFormState>{
                 }
                 else {
                     toast.success("Poll successfully submitted");
-                    <Navigate to="/userdashboard" replace={true} />
+                    this.props.navigate("/userdashboard", { replace: true });
                 }
 
             })
@@ -73,7 +73,7 @@ class UserPollForm extends Component<UserPollFormProps, UserPollFormState>{
     }
     componentDidMount() {
         if (window.history.state.usr === undefined) {
-            <Navigate to="/" replace={true} />
+            this.props.navigate("/user", { replace: true });
         }
         else {
             if (window.history.state.usr && window.history.state.usr.pollData && window.location.pathname.includes("userpollform") && window.history.state.usr.mode === "NEW") {
@@ -150,4 +150,4 @@ class UserPollForm extends Component<UserPollFormProps, UserPollFormState>{
 }
 
 
-export default UserPollForm;
+export default withRouter(UserPollForm);

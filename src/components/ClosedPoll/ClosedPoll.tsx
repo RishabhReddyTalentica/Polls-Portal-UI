@@ -1,11 +1,11 @@
 import { Component } from "react";
 import { Question } from "../../models/Question";
-import { Navigate } from "react-router-dom";
 import { fetchClosedPolls } from "../../services/api";
 import Loader from "../Loader/Loader";
 import { Container, Row, Col, Card, Form } from "react-bootstrap";
 import ChartComponent from "../ChartComponent/ChartComponent";
 import LinkComponent from "../LinkComponent/LinkComponent";
+import withRouter, { withRouterProps } from "../../services/withRouter";
 
 type ClosedPollState = {
     pollTitle: string,
@@ -13,9 +13,9 @@ type ClosedPollState = {
     transformedData: any[],
     showLoader: boolean
 }
-class ClosedPoll extends Component<any, ClosedPollState>{
+class ClosedPoll extends Component<any & withRouterProps, ClosedPollState>{
 
-    constructor(props: any) {
+    constructor(props: any & withRouterProps) {
         super(props);
         this.state = {
             pollTitle: "",
@@ -26,7 +26,7 @@ class ClosedPoll extends Component<any, ClosedPollState>{
     }
     componentDidMount() {
         if (window.history.state.usr === undefined && window.location.pathname.includes("closedpoll")) {
-            <Navigate to="/admindashboard" replace={true} />
+            this.props.navigate("/admindashboard", { replace: true });
         }
         else {
             let sampleData: any[] = [];
@@ -132,4 +132,4 @@ class ClosedPoll extends Component<any, ClosedPollState>{
 }
 
 
-export default ClosedPoll;
+export default withRouter(ClosedPoll);

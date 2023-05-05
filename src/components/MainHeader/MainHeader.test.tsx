@@ -11,7 +11,7 @@ describe('Main Header component', () => {
             login: (token) => { },
             logout: () => { },
         }}>
-            <MainHeader children={""} />
+            <MainHeader children={""} navigate={undefined} />
         </AuthContext.Provider>, { wrapper: BrowserRouter })
         const buttonElement = screen.queryByText("Logout");
         expect(buttonElement).toBeNull();
@@ -24,7 +24,7 @@ describe('Main Header component', () => {
             login: (token) => { },
             logout: () => { },
         }}>
-            <MainHeader children={""} />
+            <MainHeader children={""} navigate={undefined} />
         </AuthContext.Provider>, { wrapper: BrowserRouter });
         const buttonElement = screen.getByText("Logout");
         expect(buttonElement).toBeInTheDocument();

@@ -4,14 +4,14 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Logo from "../../TalenticaLogo.png";
 import styles from "./MainHeader.module.scss";
-import { Navigate } from "react-router-dom";
 import AuthContext from "../../store/user-context";
 import { Button } from "react-bootstrap";
+import withRouter, { withRouterProps } from "../../services/withRouter";
 
 type MainHeaderProps = {
     children: ReactNode
 }
-class MainHeader extends Component<MainHeaderProps, any> {
+class MainHeader extends Component<MainHeaderProps & withRouterProps, any> {
     static contextType: React.Context<any> = AuthContext;
     context!: React.ContextType<typeof AuthContext>;
 
@@ -38,7 +38,7 @@ class MainHeader extends Component<MainHeaderProps, any> {
                                 <Col xs={12} sm={12} md={12} lg={4} xl={4} xxl={4} className="text-center">
                                     <Button variant="outline-primary" type="button" onClick={() => {
                                         this.context.logout();
-                                        <Navigate to="/login" replace={true} />
+                                        this.props.navigate("/login", { replace: true });
                                     }}>
                                         Logout
                                     </Button>
@@ -57,4 +57,4 @@ class MainHeader extends Component<MainHeaderProps, any> {
     }
 }
 
-export default MainHeader;
+export default withRouter(MainHeader);

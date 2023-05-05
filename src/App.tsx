@@ -39,9 +39,9 @@ class App extends Component<any, any>{
         [
           { path: "/", component: <DashboardLayout><AdminDashboard /></DashboardLayout> },
           { path: "/admindashboard", component: <DashboardLayout><AdminDashboard /></DashboardLayout> },
-          { path: "/createnewpoll", component: <CreatePoll /> },
-          { path: "/openpoll/:pollId", component: <CreatePoll /> },
-          { path: "/closedpoll/:pollId", component: <ClosedPoll /> },
+          { path: "/createnewpoll", component: <CreatePoll navigate={undefined} /> },
+          { path: "/openpoll/:pollId", component: <CreatePoll navigate={undefined} /> },
+          { path: "/closedpoll/:pollId", component: <ClosedPoll navigate={undefined} /> },
           { path: "*", component: <Navigate to='/' replace /> },
 
         ]
@@ -49,18 +49,18 @@ class App extends Component<any, any>{
         [
           { path: "/", component: <DashboardLayout><UserDashboard /></DashboardLayout> },
           { path: "/userdashboard", component: <DashboardLayout><UserDashboard /></DashboardLayout> },
-          { path: "/userpollform/:pollId", component: <UserPollForm /> },
+          { path: "/userpollform/:pollId", component: <UserPollForm navigate={undefined} /> },
           { path: "*", component: <Navigate to='/' replace /> },
         ]
       :
       [
-        { path: "/", component: <LoginPage /> },
-        { path: "/login", component: <LoginPage /> },
-        { path: "/signup", component: <SignUpPage /> },
+        { path: "/", component: <LoginPage navigate={undefined} /> },
+        { path: "/login", component: <LoginPage navigate={undefined} /> },
+        { path: "/signup", component: <SignUpPage navigate={undefined} /> },
         { path: "*", component: <Navigate to='/' replace /> },
       ]
     return (
-      <MainHeader>
+      <MainHeader navigate={undefined}>
         <Routes>
           {this.routes.map((route, index) => {
             return (<Route key={index} path={route.path} element={route.component} />)
